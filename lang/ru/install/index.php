@@ -4,7 +4,6 @@ $MESS ['DX_BF_MODULE_DESCRIPTION'] = "Форма на инфоблоках с гугл каптчей";
 $MESS ['DX_BF_EVENT_NAME'] = "Новая завявка с формы обратной связи";
 $MESS ['DX_BF_EVENT_DESCRIPTION'] = "#ID# - ID заявки
 #USER_ID# - ID пользователя
-#NAME# - Имя пользователя
 #FORM_DATA# - Данные формы
 #IBLOCK_ID# - ID Инфоблока
 #IBLOCK_TYPE# - Тип инфоблока";

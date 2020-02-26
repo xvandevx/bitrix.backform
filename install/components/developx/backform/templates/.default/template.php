@@ -8,9 +8,9 @@ Loc::loadMessages(__FILE__);
 <div class="back-form">
     <div class="back-form__close backFormCloseJs">
         <svg enable-background="new 0 0 256 256" height="256px" version="1.1" viewBox="0 0 256 256" width="256px"
-             xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-        <path d="M137.051,128l75.475-75.475c2.5-2.5,2.5-6.551,0-9.051s-6.551-2.5-9.051,0L128,118.949L52.525,43.475  c-2.5-2.5-6.551-2.5-9.051,0s-2.5,6.551,0,9.051L118.949,128l-75.475,75.475c-2.5,2.5-2.5,6.551,0,9.051  c1.25,1.25,2.888,1.875,4.525,1.875s3.275-0.625,4.525-1.875L128,137.051l75.475,75.475c1.25,1.25,2.888,1.875,4.525,1.875  s3.275-0.625,4.525-1.875c2.5-2.5,2.5-6.551,0-9.051L137.051,128z"></path>
-    </svg>
+                 xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+            <path d="M137.051,128l75.475-75.475c2.5-2.5,2.5-6.551,0-9.051s-6.551-2.5-9.051,0L128,118.949L52.525,43.475  c-2.5-2.5-6.551-2.5-9.051,0s-2.5,6.551,0,9.051L118.949,128l-75.475,75.475c-2.5,2.5-2.5,6.551,0,9.051  c1.25,1.25,2.888,1.875,4.525,1.875s3.275-0.625,4.525-1.875L128,137.051l75.475,75.475c1.25,1.25,2.888,1.875,4.525,1.875  s3.275-0.625,4.525-1.875c2.5-2.5,2.5-6.551,0-9.051L137.051,128z"></path>
+        </svg>
     </div>
     <div class="back-form__content loadJs">
         <? if (!empty($arResult["RESULT"])) { ?>
@@ -19,33 +19,28 @@ Loc::loadMessages(__FILE__);
             </div>
             <div class="back-form__btn backFormCloseJs"><?= Loc::getMessage('DX_BF_CLOSE') ?></div>
         <? } else { ?>
-            <form class="back-form__form" data-goal="make_order" action="<?= $arParams["PAGE_URL"] ?>"
+            <form class="back-form__form captchaFormJs" data-goal="make_order" action="<?= $arParams["PAGE_URL"] ?>"
                   method="post">
-                <? if ($arParams['GOOGLE_CAPTCHA'] == 'Y') { ?>
-                    <input type="hidden" name="token" value="<? $_POST['token'] ?>">
-                <? } ?>
                 <div class="back-form__title">
                     <?= $arParams['TITLE'] ?>
                 </div>
-                <div>
-                    <? foreach ($arResult["FIELDS"] as $code => $field) { ?>
-                        <span class="back-form__group <? if (isset($field['ERROR'])) { ?>back-form__error<? } ?> <? if (!empty($field['VALUE'])) { ?>not-empty<? } ?>">
-                <? if ($field["TYPE"] == "S") { ?>
-                    <input type="text" name="RESULT[<?= $code ?>]" value="<?= $field["VALUE"] ?>"
-                           <? if ($field["IS_REQUIRED"] == "Y"){ ?>required<? } ?>>
-                <? } elseif ($field["TYPE"] == "HTML") { ?>
-                    <textarea type="textarea" name="RESULT[<?= $code ?>]"
-                              <? if ($field["IS_REQUIRED"] == "Y"){ ?>required<? } ?>><?= $field["VALUE"] ?></textarea>
+                <? foreach ($arResult["FIELDS"] as $code => $field) { ?>
+                    <span class="back-form__group <? if (isset($field['ERROR'])) { ?>back-form__error<? } ?> <? if (!empty($field['VALUE'])) { ?>not-empty<? } ?>">
+                        <? if ($field["TYPE"] == "S") { ?>
+                            <input type="text" name="RESULT[<?= $code ?>]" value="<?= $field["VALUE"] ?>"
+                                   <? if ($field["IS_REQUIRED"] == "Y"){ ?>required<? } ?>>
+                        <? } elseif ($field["TYPE"] == "HTML") { ?>
+                            <textarea type="textarea" name="RESULT[<?= $code ?>]"
+                                      <? if ($field["IS_REQUIRED"] == "Y"){ ?>required<? } ?>><?= $field["VALUE"] ?></textarea>
+                        <? } ?>
+                        <span class="back-form__highlight"></span>
+                        <span class="back-form__bar"></span>
+                        <label>
+                            <?= $field["NAME"] ?> <? if ($field['IS_REQUIRED'] == 'Y') { ?>*<? } ?>
+                        </label>
+                        <span class="back-form__error-text"><?= Loc::getMessage('DX_BF_EMPTY_FIELD') ?></span>
+                    </span>
                 <? } ?>
-                <span class="back-form__highlight"></span>
-                <span class="back-form__bar"></span>
-                <label>
-                    <?= $field["NAME"] ?> <? if ($field['IS_REQUIRED'] == 'Y') { ?>*<? } ?>
-                </label>
-                <span class="back-form__error-text"><?= Loc::getMessage('DX_BF_EMPTY_FIELD') ?></span>
-            </span>
-                    <? } ?>
-                </div>
                 <div class="back-form__polit">
                     <?= Loc::getMessage('DX_BF_POLIT') ?>
                 </div>

@@ -149,8 +149,8 @@ class DevelopxBackformComponent extends \CBitrixComponent
             "PROPERTY_VALUES" => $props,
         ];
 
-        if ($el->Add($arLoadProductArray)) {
-            $this->SentMessage($props);
+        if ($id = $el->Add($arLoadProductArray)) {
+            $this->SentMessage($id);
             return [
                 'SUCCESS' => true,
                 'MESSAGE' => $this->arParams['SUCCESS_TEXT']
@@ -164,13 +164,19 @@ class DevelopxBackformComponent extends \CBitrixComponent
         }
     }
 
-    private function SentMessage()
+    private function SentMessage($id)
     {
         $formData = '';
         foreach ($this->arResult['FIELDS'] as $field) {
             $formData .= $field['NAME'] . ': ' . $field['VALUE'] . '<br>';
         }
-        CEvent::Send(self::EVENT_NAME, SITE_ID, $formData);
+        CEvent::Send(self::EVENT_NAME, SITE_ID, [
+            'ID' => $id,
+            'USER_ID' => $this->arResult['USER']['ID'],
+            'FORM_DATA' => $formData,
+            'IBLOCK_ID' => $this->arParams["IBLOCK_ID"],
+            'IBLOCK_TYPE' => $this->arParams["IBLOCK_TYPE"],
+        ]);
     }
 
     public function executeComponent()
