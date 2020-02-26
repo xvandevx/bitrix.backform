@@ -31,10 +31,28 @@ class DevelopxBackformComponent extends \CBitrixComponent
 
     /**
      * @return array
-     */
-    private function getRequest()
+     **/
+    private function getFormFields()
     {
-        return Context::getCurrent()->getRequest();
+        $obCache = new CPHPCache();
+        $cacheId = 'DevelopxBackformFieldsIblockId' . $this->arParams['IBLOCK_ID'];
+        if ($obCache->InitCache($this->arParams["CACHE_TIME"], $cacheId, '/')) {
+            $fields = $obCache->GetVars();
+        } elseif ($obCache->StartDataCache()) {
+            $properties = CIBlockProperty::GetList(
+                ['SORT' => 'ASC'],
+                ['ACTIVE' => 'Y', 'IBLOCK_ID' => $this->arParams['IBLOCK_ID']]
+            );
+            while ($propFields = $properties->Fetch()) {
+                $fields[$propFields['CODE']] = [
+                    'NAME' => $propFields['NAME'],
+                    'TYPE' => $propFields['USER_TYPE'] == 'HTML' ? 'HTML' : $propFields['PROPERTY_TYPE'],
+                    'IS_REQUIRED' => $propFields['IS_REQUIRED'],
+                ];
+            }
+            $obCache->EndDataCache($fields);
+        }
+        return $fields;
     }
 
     private function getUser()
@@ -46,6 +64,71 @@ class DevelopxBackformComponent extends \CBitrixComponent
             return $rsUser->Fetch();
         }
         return false;
+    }
+
+    /**
+     * @param array $fields
+     * @param array $user
+     * @return array
+     */
+    private function checkUserDefaults($fields, $user)
+    {
+        $arUserFields = [
+            'NAME',
+            'LAST_NAME',
+            'EMAIL',
+            'PERSONAL_PHONE'
+        ];
+        foreach ($arUserFields as $userFiled) {
+            if (!empty($fields[$userFiled]) && empty($fields[$userFiled]['VALUE']) && !empty($user[$userFiled])) {
+                $fields[$userFiled]['VALUE'] = $user[$userFiled];
+            }
+        }
+        return $fields;
+    }
+
+    /**
+     * @return array
+     */
+    private function getRequest()
+    {
+        return Context::getCurrent()->getRequest();
+    }
+
+    /**
+     * @return boolean
+     */
+    public function checkFieldsResult()
+    {
+        $checked = true;
+        foreach ($this->arResult['FIELDS'] as $code => $field) {
+            if ($field['IS_REQUIRED'] == 'Y' && empty($this->arRequest['RESULT'][$code])) {
+                $checked = false;
+                $this->arResult['FIELDS'][$code]['ERROR'] = 'Y';
+            }
+            $this->arResult['FIELDS'][$code]['VALUE'] = $this->arRequest['RESULT'][$code];
+        }
+        return $checked;
+    }
+
+    /**
+     * @return boolean
+     */
+    private function checkCaptcha()
+    {
+        if ($this->arParams['INCLUDE_GOOGLE_CAPTCHA'] != 'Y') {
+            return true;
+        }
+        $captchaObj = new Developx\Gcaptcha\Main();
+        if ($captchaObj->checkCaptcha()) {
+            return true;
+        } else {
+            $this->arResult["RESULT"] = [
+                'SUCCESS' => false,
+                'MESSAGE' => Loc::getMessage('DX_CMT_CAPTCHA_ERROR')
+            ];
+            return false;
+        }
     }
 
     /**
@@ -84,93 +167,10 @@ class DevelopxBackformComponent extends \CBitrixComponent
     private function SentMessage()
     {
         $formData = '';
-        foreach ($this->arResult['FIELDS'] as $field){
+        foreach ($this->arResult['FIELDS'] as $field) {
             $formData .= $field['NAME'] . ': ' . $field['VALUE'] . '<br>';
         }
         CEvent::Send(self::EVENT_NAME, SITE_ID, $formData);
-    }
-
-    /**
-     * @return boolean
-     */
-    private function checkCaptcha()
-    {
-        if ($this->arParams['INCLUDE_GOOGLE_CAPTCHA'] != 'Y'){
-            return true;
-        }
-        $captchaObj = new Developx\Gcaptcha\Main();
-        if ($captchaObj->checkCaptcha()) {
-            return true;
-        } else {
-            $this->arResult["RESULT"] = [
-                'SUCCESS' => false,
-                'MESSAGE' => Loc::getMessage('DX_CMT_CAPTCHA_ERROR')
-            ];
-            return false;
-        }
-    }
-
-    /**
-     * @return array
-     **/
-    private function getFormFields()
-    {
-        $obCache = new CPHPCache();
-        $cacheId = 'DevelopxBackformFieldsIblockId' . $this->arParams['IBLOCK_ID'];
-        if ($obCache->InitCache($this->arParams["CACHE_TIME"], $cacheId, '/')) {
-            $fields = $obCache->GetVars();
-        } elseif ($obCache->StartDataCache()) {
-            $properties = CIBlockProperty::GetList(
-                ['SORT' => 'ASC'],
-                ['ACTIVE' => 'Y', 'IBLOCK_ID' => $this->arParams['IBLOCK_ID']]
-            );
-            while ($propFields = $properties->Fetch()) {
-                $fields[$propFields['CODE']] = [
-                    'NAME' => $propFields['NAME'],
-                    'TYPE' => $propFields['USER_TYPE'] == 'HTML' ? 'HTML' : $propFields['PROPERTY_TYPE'],
-                    'IS_REQUIRED' => $propFields['IS_REQUIRED'],
-                ];
-            }
-            $obCache->EndDataCache($fields);
-        }
-        return $fields;
-    }
-
-    /**
-     * @return boolean
-     */
-    public function checkFieldsResult()
-    {
-        $checked = true;
-        foreach ($this->arResult['FIELDS'] as $code => $field) {
-            if ($field['IS_REQUIRED'] == 'Y' && empty($this->arRequest['RESULT'][$code])) {
-                $checked = false;
-                $this->arResult['FIELDS'][$code]['ERROR'] = 'Y';
-            }
-            $this->arResult['FIELDS'][$code]['VALUE'] = $this->arRequest['RESULT'][$code];
-        }
-        return $checked;
-    }
-
-    /**
-     * @param array $fields
-     * @param array $user
-     * @return array
-     */
-    private function checkUserDefaults($fields, $user)
-    {
-        $arUserFileds = [
-            'NAME',
-            'LAST_NAME',
-            'EMAIL',
-            'PERSONAL_PHONE'
-        ];
-        foreach ($arUserFileds as $userFiled) {
-            if (!empty($fields[$userFiled]) && empty($fields[$userFiled]['VALUE']) && !empty($user[$userFiled])) {
-                $fields[$userFiled]['VALUE'] = $user[$userFiled];
-            }
-        }
-        return $fields;
     }
 
     public function executeComponent()
