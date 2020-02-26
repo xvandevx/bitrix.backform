@@ -5,8 +5,6 @@ use Bitrix\Main\Application;
 use Bitrix\Main\Loader;
 use Bitrix\Main\Localization\Loc;
 use Bitrix\Main\ModuleManager;
-use Developx\Tk\DB\DeliveryInfoTable;
-use Developx\Tk\DB\PointsTable;
 
 if (class_exists('developx_backform')) {
     return;
@@ -38,6 +36,9 @@ class developx_backform extends CModule
     /** @var string */
     public $PARTNER_URI;
 
+    /** @var string */
+    public $eventName = "DEVELOPX_NEW_FEEDBACK";
+
     public function __construct()
     {
         $arModuleVersion = [];
@@ -49,9 +50,9 @@ class developx_backform extends CModule
         }
 
         Loc::loadMessages(__FILE__);
-        $this->MODULE_ID = 'developx.tk';
-        $this->MODULE_NAME = Loc::getMessage('dx_bf_module_name');
-        $this->MODULE_DESCRIPTION = Loc::getMessage('dx_bf_module_description');
+        $this->MODULE_ID = 'developx.backform';
+        $this->MODULE_NAME = Loc::getMessage('DX_BF_MODULE_NAME');
+        $this->MODULE_DESCRIPTION = Loc::getMessage('DX_BF_MODULE_DESCRIPTION');
         $this->MODULE_GROUP_RIGHTS = 'N';
         $this->PARTNER_NAME = 'Developx';
         $this->PARTNER_URI = 'https://developx.ru';
@@ -61,11 +62,13 @@ class developx_backform extends CModule
     {
         ModuleManager::registerModule($this->MODULE_ID);
         $this->InstallFiles();
+        $this->addEvent();
     }
 
     public function doUninstall()
     {
         $this->uninstallFiles();
+        $this->deleteEvent();
         ModuleManager::unregisterModule($this->MODULE_ID);
     }
 
@@ -80,4 +83,48 @@ class developx_backform extends CModule
         DeleteDirFilesEx("/bitrix/components/developx/backform");
     }
 
+    public function addEvent()
+    {
+        $obEventType = new CEventType;
+        $obEventType->Add(array(
+            "EVENT_NAME" => $this->eventName,
+            "NAME" => Loc::getMessage('DX_BF_EVENT_NAME'),
+            "SITE_ID" => "ru",
+            "DESCRIPTION" => Loc::getMessage('DX_BF_EVENT_DESCRIPTION')
+        ));
+
+
+        $arSites = array();
+        $rsSites = CSite::GetList($by="sort", $order="desc");
+        while ($arSite = $rsSites->Fetch())
+        {
+            $arSites[] = $arSite['LID'];
+        }
+        $obTemplate = new CEventMessage;
+        $obTemplate->Add(array(
+            "ACTIVE" => "Y",
+            "EVENT_NAME" => $this->eventName,
+            "LID" => $arSites,
+            "EMAIL_FROM" => "#DEFAULT_EMAIL_FROM#",
+            "EMAIL_TO" => "#DEFAULT_EMAIL_FROM#",
+            "BCC" => "",
+            "SUBJECT" => Loc::getMessage('DX_BF_EVENT_SUBJECT'),
+            "BODY_TYPE" => "html",
+            "MESSAGE" => Loc::getMessage('DX_BF_EVENT_MESSAGE')
+        ));
+    }
+
+    public function deleteEvent()
+    {
+        $rsMess = CEventMessage::GetList($by="site_id", $order="desc", ["TYPE_ID" => $this->eventName]);
+
+        while($arMess = $rsMess->GetNext())
+        {
+            $emessage = new CEventMessage;
+            $emessage->Delete($arMess['ID']);
+        }
+
+        $et = new CEventType;
+        $et->Delete($this->eventName);
+    }
 }

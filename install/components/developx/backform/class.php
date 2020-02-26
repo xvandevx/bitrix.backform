@@ -13,17 +13,14 @@ class DevelopxBackformComponent extends \CBitrixComponent
 {
     protected $arRequest;
     const DEFAULT_CACHE_TIME = 36000000;
+    const EVENT_NAME = "DEVELOPX_NEW_FEEDBACK";
 
     public function onPrepareComponentParams($arParams)
     {
-        if (
-            $arParams['GOOGLE_CAPTCHA'] == 'Y' &&
-            (
-                empty($arParams['CAPTCHA_KEY']) ||
-                empty($arParams['CAPTCHA_SECRET'])
-            )
+        if ($arParams['INCLUDE_GOOGLE_CAPTCHA'] == 'Y' &&
+            !Loader::includeModule(self::CAPTCHA_MODULE_NAME)
         ) {
-            $arParams['GOOGLE_CAPTCHA'] = 'N';
+            $arParams['INCLUDE_GOOGLE_CAPTCHA'] = 'N';
         }
 
         if (!isset($arParams["CACHE_TIME"])) {
@@ -32,6 +29,9 @@ class DevelopxBackformComponent extends \CBitrixComponent
         return $arParams;
     }
 
+    /**
+     * @return array
+     */
     private function getRequest()
     {
         return Context::getCurrent()->getRequest();
@@ -48,6 +48,9 @@ class DevelopxBackformComponent extends \CBitrixComponent
         return false;
     }
 
+    /**
+     * @return array
+     */
     private function saveFormOrder()
     {
         $el = new CIBlockElement;
@@ -78,36 +81,38 @@ class DevelopxBackformComponent extends \CBitrixComponent
         }
     }
 
-    private function SentMessage($fields)
+    private function SentMessage()
     {
-        if (!empty($this->arParams["EMAIL_EVENT"])) {
-            CEvent::Send($this->arParams["EMAIL_EVENT"], SITE_ID, $fields);
+        $formData = '';
+        foreach ($this->arResult['FIELDS'] as $field){
+            $formData .= $field['NAME'] . ': ' . $field['VALUE'] . '<br>';
         }
+        CEvent::Send(self::EVENT_NAME, SITE_ID, $formData);
     }
 
+    /**
+     * @return boolean
+     */
     private function checkCaptcha()
     {
-        if ($this->arParams['GOOGLE_CAPTCHA'] != 'Y') {
+        if ($this->arParams['INCLUDE_GOOGLE_CAPTCHA'] != 'Y'){
             return true;
         }
-
-        if (!empty($_REQUEST['token'])) {
-            $url_google_api = 'https://www.google.com/recaptcha/api/siteverify';
-            $query = $url_google_api . '?secret=' . $this->arParams['CAPTCHA_SECRET'] . '&response=' . $_REQUEST['token'] . '&remoteip=' . $_SERVER['REMOTE_ADDR'];
-            $data = json_decode(file_get_contents($query));
-
-            if ($data->success && $data->score > 0.2 && $data->action == 'backFormSent') {
-                return true;
-            }
+        $captchaObj = new Developx\Gcaptcha\Main();
+        if ($captchaObj->checkCaptcha()) {
+            return true;
+        } else {
+            $this->arResult["RESULT"] = [
+                'SUCCESS' => false,
+                'MESSAGE' => Loc::getMessage('DX_CMT_CAPTCHA_ERROR')
+            ];
+            return false;
         }
-
-        $this->arResult["RESULT"] = [
-            'SUCCESS' => false,
-            'MESSAGE' => Loc::getMessage('DX_BF_CAPTCHA_ERROR')
-        ];
-        return false;
     }
 
+    /**
+     * @return array
+     **/
     private function getFormFields()
     {
         $obCache = new CPHPCache();
@@ -131,6 +136,9 @@ class DevelopxBackformComponent extends \CBitrixComponent
         return $fields;
     }
 
+    /**
+     * @return boolean
+     */
     public function checkFieldsResult()
     {
         $checked = true;
@@ -144,6 +152,11 @@ class DevelopxBackformComponent extends \CBitrixComponent
         return $checked;
     }
 
+    /**
+     * @param array $fields
+     * @param array $user
+     * @return array
+     */
     private function checkUserDefaults($fields, $user)
     {
         $arUserFileds = [

@@ -2,49 +2,12 @@ $(document).ready(function ($) {
     if (window.DevelopxBackform)
         return;
 
-    window.DevelopxBackform = function (useCaptcha, captchaKey) {
-        this.useCaptcha = useCaptcha;
-        this.captchaKey = captchaKey;
-        this.captchaInterval = false;
-        this.initCaptcha();
+    window.DevelopxBackform = function () {
         this.initButtons();
         this.initLoader();
     };
 
     window.DevelopxBackform.prototype = {
-        initCaptcha: function () {
-            var $this = this;
-            if (
-                typeof grecaptcha == 'undefined' ||
-                $this.useCaptcha != 'Y'
-            ) {
-                return;
-            }
-            grecaptcha.ready(function () {
-                $this.resetCaptcha();
-
-                $this.captchaInterval = setInterval(
-                    function () {
-                        $this.resetCaptcha();
-                    },
-                    150000
-                );
-            });
-        },
-        clearCaptchaInterval: function () {
-            var $this = this;
-            if ($this.captchaInterval) {
-                $this.captchaInterval.clearInterval();
-            }
-        },
-        resetCaptcha: function () {
-            var $this = this;
-            grecaptcha.execute($this.captchaKey, {action: 'backFormSent'})
-                .then(function (token) {
-                    console.log(token);
-                    $('.back-form input[name=token]').val(token);
-                });
-        },
         initButtons: function () {
             var $this = this;
             $('body').on('click', '.backFormShowJs', function () {
@@ -94,4 +57,6 @@ $(document).ready(function ($) {
             })
         },
     }
+
+    DevelopxBackform_ = new DevelopxBackform();
 });

@@ -31,9 +31,6 @@ $arComponentParameters = array(
         "FIELDS" => array(
             "NAME" => GetMessage("DX_BF_PARAMS_GROUPS_FIELDS"),
         ),
-        "CAPTCHA" => array(
-            "NAME" => GetMessage("DX_BF_PARAMS_GROUPS_CAPTCHA"),
-        ),
         "ADDITIONALLY" => array(
             "NAME" => GetMessage("DX_BF_PARAMS_GROUPS_ADDITIONALLY"),
         ),
@@ -79,23 +76,11 @@ $arComponentParameters = array(
             "TYPE" => "STRING",
             "DEFAULT" => GetMessage("DX_BF_PARAMS_ITEM_SENT_BUTTON_TEXT_DEFAULT"),
         ),
-        "GOOGLE_CAPTCHA" => array(
-            "PARENT" => "CAPTCHA",
-            "NAME" => GetMessage("DX_BF_PARAMS_ITEM_GOOGLE_CAPTCHA"),
+        "INCLUDE_GOOGLE_CAPTCHA" => array(
+            "PARENT" => "ADDITIONALLY",
+            "NAME" => GetMessage("DX_BF_PRM_ITEM_INCLUDE_GOOGLE_CAPTCHA"),
             "TYPE" => "CHECKBOX",
-            "DEFAULT" => "N",
-        ),
-        "CAPTCHA_KEY" => array(
-            "PARENT" => "CAPTCHA",
-            "NAME" => GetMessage("DX_BF_PARAMS_ITEM_CAPTCHA_KEY"),
-            "TYPE" => "STRING",
-            "DEFAULT" => "",
-        ),
-        "CAPTCHA_SECRET" => array(
-            "PARENT" => "CAPTCHA",
-            "NAME" => GetMessage("DX_BF_PARAMS_ITEM_CAPTCHA_SECRET"),
-            "TYPE" => "STRING",
-            "DEFAULT" => "",
+            "DEFAULT" => "Y",
         ),
         "INCLUDE_JQUERY" => array(
             "PARENT" => "ADDITIONALLY",
