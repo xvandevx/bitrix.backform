@@ -7,10 +7,10 @@ $MESS ['DX_BF_EVENT_DESCRIPTION'] = "#ID# - ID заявки
 #FORM_DATA# - Данные формы
 #IBLOCK_ID# - ID Инфоблока
 #IBLOCK_TYPE# - Тип инфоблока";
-$MESS ['DX_BF_EVENT_SUBJECT'] = "На сайте #SITE_NAME# был оставлен новый комментарий - #ID#";
-$MESS ['DX_BF_EVENT_MESSAGE'] = "На сайте #SITE_NAME# был оставлен новый комментарий<br>
+$MESS ['DX_BF_EVENT_SUBJECT'] = "На сайте #SITE_NAME# была оставлена новая заявка - #ID#";
+$MESS ['DX_BF_EVENT_MESSAGE'] = "На сайте #SITE_NAME# была оставлена новая заявка<br>
 <br>
-Пользователь: #USER_ID#<br><br>
+ID пользователя: #USER_ID#<br><br>
 Данные формы:<br>
 #FORM_DATA#
 <br>

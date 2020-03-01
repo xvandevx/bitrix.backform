@@ -10,5 +10,6 @@ $MESS ["DX_BF_PRM_ITEM_SUCCESS_TEXT"] = "Текст успешной отправки";
 $MESS ["DX_BF_PRM_ITEM_SUCCESS_TEXT_DEFAULT"] = "Ваш сообщение отправлено!";
 $MESS ["DX_BF_PRM_ITEM_SENT_BUTTON_TEXT"] = "Текст кнопки отправки";
 $MESS ["DX_BF_PRM_ITEM_SENT_BUTTON_TEXT_DEFAULT"] = "Отправить";
-$MESS ["DX_BF_PRM_ITEM_INCLUDE_GOOGLE_CAPTCHA"] = "Подключить Гуглкаптчу(через модуль developx.gcaptcha)";
+$MESS ["DX_BF_PRM_ITEM_INCLUDE_GOOGLE_CAPTCHA"] = "Подключить ГуглКаптчу(через модуль developx.gcaptcha)";
 $MESS ["DX_BF_PRM_ITEM_INCLUDE_JQUERY"] = "Подключить библиотеку jQuery";
+$MESS ["DX_BF_PRM_ITEM_AJAX_MODE"] = "Режим Ajax (обязателен для работы компонента)";

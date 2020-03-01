@@ -14,6 +14,7 @@ class DevelopxBackformComponent extends \CBitrixComponent
     protected $arRequest;
     const DEFAULT_CACHE_TIME = 36000000;
     const EVENT_NAME = "DEVELOPX_NEW_FEEDBACK";
+    const CAPTCHA_MODULE_NAME = 'developx.gcaptcha';
 
     public function onPrepareComponentParams($arParams)
     {
@@ -26,6 +27,9 @@ class DevelopxBackformComponent extends \CBitrixComponent
         if (!isset($arParams["CACHE_TIME"])) {
             $arParams["CACHE_TIME"] = self::DEFAULT_CACHE_TIME;
         }
+
+        $arParams['AJAX_OPTION_JUMP'] = 'N';
+        $arParams['AJAX_OPTION_HISTORY'] = 'N';
         return $arParams;
     }
 
