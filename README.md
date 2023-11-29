@@ -1,6 +1,6 @@
-# developx.backform
+# Bitrix.backform
 
-Developx: компонент формы обратной связи
+Компонент формы обратной связи
 с использованием инфоблоков и ГуглКаптчи 3
 
 Для работы ГуглКаптчи требуется модуль https://marketplace.1c-bitrix.ru/solutions/developx.gcaptcha
